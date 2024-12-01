@@ -1,9 +1,9 @@
 import os
 import requests
 
+from shared import log
 from getpass import getpass
 from datetime import datetime, timezone
-from shared.python import log
 
 SELF_PATH = os.path.dirname(os.path.realpath(__file__))
 
@@ -30,7 +30,7 @@ session_cookie = None
 for year in range(2015, last_year + 1):
     for day in range(1, last_day + 1 if year == last_year else 25 + 1):
         puzzle_input_output_path = os.path.join(
-            SELF_PATH, "data", str(year), f"{day}.txt")
+            SELF_PATH, "..", "puzzle-inputs", str(year), f"{day}.txt")
         if os.path.exists(puzzle_input_output_path):
             continue
         if session_cookie is None:
