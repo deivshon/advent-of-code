@@ -1,8 +1,21 @@
 open Shared
 
+let is_valid_report_alternative levels =
+  let is_invalid_diff diff =
+    let abs_diff = Int.abs diff in
+    abs_diff > 3 || abs_diff = 0
+  in
+  let no_tail = List.tl levels in
+  let no_head = List.rev (List.tl (List.rev levels)) in
+  let diffs = List.map2 (fun prev next -> prev - next) no_tail no_head in
+  let any_invalid = List.length (List.filter is_invalid_diff diffs) > 0 in
+  let all_negative = List.length (List.filter (fun d -> d > 0) diffs) = 0 in
+  let all_positive = List.length (List.filter (fun d -> d < 0) diffs) = 0 in
+  (not any_invalid) && (all_negative || all_positive)
+
 type report_direction = Increasing | Decreasing
 
-let is_valid_report levels =
+let is_valid_report report =
   let rec inner levels previous_direction =
     match levels with
     | [] -> true
@@ -21,7 +34,7 @@ let is_valid_report levels =
               if current_direction != d then false
               else (inner [@tailcall]) (l2 :: rest) previous_direction)
   in
-  inner levels None
+  inner report None
 
 let parse_puzzle_input raw_input =
   raw_input
