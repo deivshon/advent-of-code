@@ -2,4 +2,4 @@
 
 (library
  (name aoc)
- (libraries core))
+ (libraries re core))
