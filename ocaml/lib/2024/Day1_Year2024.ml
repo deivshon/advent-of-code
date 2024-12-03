@@ -4,7 +4,7 @@ open Shared
 let parse_puzzle_input raw_input =
   let parsed_pair_results =
     raw_input
-    |> remove_empty_lines
+    |> remove_empty_strings
     |> List.map (String.split_on_char ' ')
     |> List.map (fun pair -> List.filter (fun s -> String.length s > 0) pair)
     |> List.map (fun pair ->

@@ -11,4 +11,4 @@ let uncurry3 f (a, b, c) = f a b c
 let list_count f l =
   List.fold_left (fun acc v -> if f v then acc + 1 else acc) 0 l
 
-let remove_empty_lines = List.filter (fun line -> String.length line > 0)
+let remove_empty_strings = List.filter (fun line -> String.length line > 0)

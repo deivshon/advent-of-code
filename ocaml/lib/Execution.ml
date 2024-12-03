@@ -28,7 +28,7 @@ let execute_solution execution =
               Printf.printf "%s: %s !!! (expected %s)\n" execution_date v
                 expected
         | None ->
-            Printf.printf "%s: %s ??? (no expected solution specified)"
+            Printf.printf "%s: %s ??? (no expected solution specified)\n"
               execution_date v)
     | Error err ->
         Printf.printf "%s: could not obtain solution: %s\n" execution_date err
