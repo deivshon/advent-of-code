@@ -1,21 +1,15 @@
 open Shared
 
-let is_valid_report_alternative levels =
-  let is_invalid_diff diff =
-    let abs_diff = Int.abs diff in
-    abs_diff > 3 || abs_diff = 0
-  in
-  let no_tail = List.tl levels in
-  let no_head = List.rev (List.tl (List.rev levels)) in
-  let diffs = List.map2 (fun prev next -> prev - next) no_tail no_head in
-  let any_invalid = List.length (List.filter is_invalid_diff diffs) > 0 in
-  let all_negative = List.length (List.filter (fun d -> d > 0) diffs) = 0 in
-  let all_positive = List.length (List.filter (fun d -> d < 0) diffs) = 0 in
-  (not any_invalid) && (all_negative || all_positive)
+let parse_puzzle_input raw_input =
+  raw_input
+  |> remove_empty_strings
+  |> List.map (String.split_on_char ' ')
+  |> List.map remove_empty_strings
+  |> List.map (fun l -> List.map int_of_string l)
 
 type report_direction = Increasing | Decreasing
 
-let is_valid_report report =
+let is_valid_report_part1 report =
   let rec inner levels previous_direction =
     match levels with
     | [] -> true
@@ -36,18 +30,19 @@ let is_valid_report report =
   in
   inner report None
 
-let parse_puzzle_input raw_input =
-  raw_input
-  |> remove_empty_strings
-  |> List.map (String.split_on_char ' ')
-  |> List.map remove_empty_strings
-  |> List.map (fun ls -> List.map int_of_string ls)
+let is_valid_report_part2 report =
+  List.init (List.length report) Fun.id
+  |> List.map (fun idx -> report |> without_element_at idx)
+  |> List.map (fun dampened_report -> is_valid_report_part1 dampened_report)
+  |> List.filter Fun.id
+  |> List.length
+  > 0
 
-let first_solution raw_input =
+let solution ~report_validity_fn raw_input =
   let puzzle_input = parse_puzzle_input raw_input in
   let successful_reports =
-    List.map is_valid_report puzzle_input
-    |> List.filter (fun report_result -> report_result)
+    List.map report_validity_fn puzzle_input
+    |> List.filter Fun.id
     |> List.length
   in
   Ok (string_of_int successful_reports)
@@ -55,10 +50,17 @@ let first_solution raw_input =
 let (solutions : Execution.solution list) =
   [
     {
-      solution_fn = first_solution;
+      solution_fn = solution ~report_validity_fn:is_valid_report_part1;
       day = 2;
       year = 2024;
       solution_number = 1;
       expected_solution = Some "371";
+    };
+    {
+      solution_fn = solution ~report_validity_fn:is_valid_report_part2;
+      day = 2;
+      year = 2024;
+      solution_number = 2;
+      expected_solution = Some "426";
     };
   ]
