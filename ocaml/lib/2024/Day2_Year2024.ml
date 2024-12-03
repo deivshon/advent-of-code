@@ -2,26 +2,26 @@ open Shared
 
 type report_direction = Increasing | Decreasing
 
-let is_valid_report reports =
-  let rec inner reports previous_direction =
-    match reports with
+let is_valid_report levels =
+  let rec inner levels previous_direction =
+    match levels with
     | [] -> true
     | [ _ ] -> true
-    | r1 :: r2 :: rest -> (
+    | l1 :: l2 :: rest -> (
         let current_direction =
-          if r1 - r2 > 0 then Increasing else Decreasing
+          if l1 - l2 > 0 then Increasing else Decreasing
         in
-        let distance = Int.abs (r1 - r2) in
+        let distance = Int.abs (l1 - l2) in
         let distance_exceeded = distance > 3 || distance == 0 in
         if distance_exceeded then false
         else
           match previous_direction with
-          | None -> (inner [@tailcall]) (r2 :: rest) (Some current_direction)
+          | None -> (inner [@tailcall]) (l2 :: rest) (Some current_direction)
           | Some d ->
               if current_direction != d then false
-              else (inner [@tailcall]) (r2 :: rest) previous_direction)
+              else (inner [@tailcall]) (l2 :: rest) previous_direction)
   in
-  inner reports None
+  inner levels None
 
 let parse_puzzle_input raw_input =
   raw_input
