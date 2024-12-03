@@ -33,7 +33,7 @@ let is_valid_report_part1 report =
 let is_valid_report_part2 report =
   List.init (List.length report) Fun.id
   |> List.map (fun idx -> report |> without_element_at idx)
-  |> List.map (fun dampened_report -> is_valid_report_part1 dampened_report)
+  |> List.map is_valid_report_part1
   |> List.filter Fun.id
   |> List.length
   > 0
