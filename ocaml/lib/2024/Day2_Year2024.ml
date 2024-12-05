@@ -33,10 +33,7 @@ let is_valid_report_part1 report =
 let is_valid_report_part2 report =
   List.init (List.length report) Fun.id
   |> List.map (fun idx -> report |> without_element_at idx)
-  |> List.map is_valid_report_part1
-  |> List.filter Fun.id
-  |> List.length
-  > 0
+  |> List.exists is_valid_report_part1
 
 let solution ~report_validity_fn raw_input =
   let puzzle_input = parse_puzzle_input raw_input in
