@@ -23,3 +23,16 @@ let without_element_at idx l =
   inner l idx [] 0 |> List.rev
 
 let remove_empty_strings = List.filter (fun line -> String.length line > 0)
+
+let remove_empty_strings_at_end l =
+  let rec inner l acc keep_removing =
+    match l with
+    | [] -> acc
+    | x :: xs ->
+        if not keep_removing then
+          (inner [@tailcall]) xs (x :: acc) keep_removing
+        else if String.length x = 0 then
+          (inner [@tailcall]) xs acc keep_removing
+        else (inner [@tailcall]) xs (x :: acc) false
+  in
+  inner (List.rev l) [] true
