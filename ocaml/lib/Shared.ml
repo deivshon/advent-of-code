@@ -11,6 +11,23 @@ let uncurry3 f (a, b, c) = f a b c
 let list_count f l =
   List.fold_left (fun acc v -> if f v then acc + 1 else acc) 0 l
 
+let list_remove_duplicates f l =
+  let step acc x =
+    match List.find_index (f x) acc with Some _ -> acc | None -> x :: acc
+  in
+  List.fold_left step [] l
+
+let list_contains_duplicates f l =
+  let rec inner l acc =
+    match l with
+    | [] -> false
+    | x :: xs -> (
+        match List.find_index (f x) acc with
+        | Some _ -> true
+        | None -> (inner [@tailcall]) xs (x :: acc))
+  in
+  inner l []
+
 let without_element_at idx l =
   let rec inner l target_idx acc current_idx =
     match l with

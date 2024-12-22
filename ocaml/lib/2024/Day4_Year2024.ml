@@ -54,7 +54,7 @@ let count_x_mas matrix =
     let center = Matrix.element_at ~row:row_idx ~col:col_idx matrix in
     center = 'A' && has_mas_corners row_idx col_idx
   in
-  Matrix.concat_map is_x_mas_center matrix |> list_count Fun.id
+  Matrix.init_map is_x_mas_center matrix |> list_count Fun.id
 
 let second_solution raw_input =
   let char_matrix = parse_puzzle_input raw_input in

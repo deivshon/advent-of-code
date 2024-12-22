@@ -26,7 +26,20 @@ let get_dimensions matrix =
       raise
         (Invalid_matrix "rows number did not always match with columns number")
 
-let concat_map f matrix =
+let find_index f matrix =
+  let rec inner f matrix row_idx =
+    match matrix with
+    | [] -> raise Not_found
+    | x :: xs -> (
+        match List.find_index f x with
+        | Some matching_col_idx -> (row_idx, matching_col_idx)
+        | None -> (inner [@tailcall]) f xs (row_idx + 1))
+  in
+  inner f matrix 0
+
+let map f matrix = List.map (fun row -> List.map f row) matrix
+
+let init_map f matrix =
   let rows, cols = get_dimensions matrix in
   let rows_indexes = List.init rows Fun.id in
   let cols_indexes = List.init cols Fun.id in
