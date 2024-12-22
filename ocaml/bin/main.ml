@@ -25,9 +25,11 @@ let () =
       try
         let year = int_of_string year_arg.contents in
         let day = int_of_string day_arg.contents in
-        Ok
-          (Some
-             (List.find_all (fun s -> s.year = year && s.day = day) solutions))
+        match
+          List.find_all (fun s -> s.year = year && s.day = day) solutions
+        with
+        | [] -> Error "no solution found for specified day and year"
+        | ls -> Ok (Some ls)
       with
       | Not_found ->
           Error
