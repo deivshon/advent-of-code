@@ -1,10 +1,8 @@
-open Shared
-
 let parse_puzzle_input raw_input =
   raw_input
-  |> remove_empty_strings
+  |> StringList.remove_empty
   |> List.map (String.split_on_char ' ')
-  |> List.map remove_empty_strings
+  |> List.map StringList.remove_empty
   |> List.map (fun l -> List.map int_of_string l)
 
 type report_direction = Increasing | Decreasing
@@ -32,7 +30,7 @@ let is_valid_report_part1 report =
 
 let is_valid_report_part2 report =
   List.init (List.length report) Fun.id
-  |> List.map (fun idx -> report |> without_element_at idx)
+  |> List.map (fun idx -> report |> ListExt.without_element_at idx)
   |> List.exists is_valid_report_part1
 
 let solution ~report_validity_fn raw_input =

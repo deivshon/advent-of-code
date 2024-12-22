@@ -17,7 +17,7 @@ let execute_solution execution =
     try
       let execution_date = date_of execution in
       let puzzle_input =
-        Utils.get_puzzle_input_lines ~year:execution.year ~day:execution.day
+        Puzzle.get_input ~year:execution.year ~day:execution.day
       in
       let solution = execution.solution_fn puzzle_input in
       match solution with

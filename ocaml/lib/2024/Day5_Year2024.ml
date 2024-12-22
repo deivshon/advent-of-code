@@ -1,5 +1,3 @@
-open Shared
-
 let parse_page_orderings raw_page_ordering =
   raw_page_ordering
   |> String.split_on_char '\n'
@@ -17,7 +15,7 @@ let parse_puzzle_input raw_input =
   let raw_page_ordering, raw_updates =
     let split_input =
       raw_input
-      |> remove_empty_strings_at_end
+      |> StringList.rstrip_empty
       |> String.concat "\n"
       |> Str.split (Str.regexp "\n\n")
     in

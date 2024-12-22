@@ -1,8 +1,6 @@
-open Shared
-
 let parse_puzzle_input raw_input =
   raw_input
-  |> remove_empty_strings
+  |> StringList.remove_empty
   |> List.map (fun s -> List.init (String.length s) (String.get s))
 
 let char_matrix_to_lines matrix =
@@ -54,7 +52,7 @@ let count_x_mas matrix =
     let center = Matrix.element_at ~row:row_idx ~col:col_idx matrix in
     center = 'A' && has_mas_corners row_idx col_idx
   in
-  Matrix.init_map is_x_mas_center matrix |> list_count Fun.id
+  Matrix.init_flatten is_x_mas_center matrix |> ListExt.count Fun.id
 
 let second_solution raw_input =
   let char_matrix = parse_puzzle_input raw_input in

@@ -1,5 +1,3 @@
-open Shared
-
 type direction = Up | Right | Down | Left
 
 exception Invalid_world_map of string
@@ -9,7 +7,7 @@ let direction_turned_right direction =
 
 let parse_puzzle_input raw_input =
   raw_input
-  |> remove_empty_strings
+  |> StringList.remove_empty
   |> List.map (fun s -> List.init (String.length s) (String.get s))
 
 let find_start_position world_map =
@@ -90,7 +88,7 @@ let get_unique_walked ?(new_obstacle = None) position direction world_map =
         in
         let unique_positions =
           new_acc
-          |> list_remove_duplicates is_same_position
+          |> ListExt.remove_duplicates is_same_position
           |> List.map (fun (p_row, p_col, _) -> (p_row, p_col))
         in
         (unique_positions, entered_loop)
@@ -120,7 +118,7 @@ let second_solution raw_input =
   in
   List.filter (fun position -> position <> start_position) walked
   |> ListExt.par_map (enters_loop start_position Up world_map)
-  |> list_count Fun.id
+  |> ListExt.count Fun.id
   |> Result.ok
   |> Result.map string_of_int
 

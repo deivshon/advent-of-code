@@ -39,7 +39,7 @@ let find_index f matrix =
 
 let map f matrix = List.map (fun row -> List.map f row) matrix
 
-let init_map f matrix =
+let init_flatten f matrix =
   let rows, cols = get_dimensions matrix in
   let rows_indexes = List.init rows Fun.id in
   let cols_indexes = List.init cols Fun.id in
