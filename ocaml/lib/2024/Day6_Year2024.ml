@@ -119,7 +119,7 @@ let second_solution raw_input =
     entered_loop
   in
   List.filter (fun position -> position <> start_position) walked
-  |> List.map (enters_loop start_position Up world_map)
+  |> ListExt.par_map (enters_loop start_position Up world_map)
   |> list_count Fun.id
   |> Result.ok
   |> Result.map string_of_int
