@@ -1,11 +1,7 @@
 let parse_puzzle_input raw_input =
-  raw_input
-  |> StringList.remove_empty
-  |> List.map (fun s -> List.init (String.length s) (String.get s))
+  raw_input |> StringList.remove_empty |> List.map CharList.from_string
 
-let char_matrix_to_lines matrix =
-  let char_list_to_string l = String.of_seq (List.to_seq l) in
-  matrix |> List.map char_list_to_string
+let char_matrix_to_lines matrix = matrix |> List.map CharList.to_string
 
 let count_xmas s =
   let xmas_re = Re.Posix.compile_pat {|XMAS|} in
@@ -19,7 +15,7 @@ let first_solution raw_input =
   let diagonals = Matrix.get_diagonals char_matrix |> char_matrix_to_lines in
   let count =
     List.map count_xmas (standard @ transposed @ diagonals)
-    |> List.fold_left (fun acc v -> acc + v) 0
+    |> List.fold_left ( + ) 0
   in
   Ok (string_of_int count)
 
