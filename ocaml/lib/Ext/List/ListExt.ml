@@ -6,16 +6,16 @@ let remove_duplicates f ls =
   in
   List.fold_left step [] ls
 
-let contains_duplicates f l =
-  let rec inner l acc =
-    match l with
+let contains_duplicates f ls =
+  let rec inner ls acc =
+    match ls with
     | [] -> false
     | x :: xs -> (
         match List.find_index (f x) acc with
         | Some _ -> true
         | None -> (inner [@tailcall]) xs (x :: acc))
   in
-  inner l []
+  inner ls []
 
 let chunk amount ls =
   let chunk_size = List.length ls / amount in
@@ -30,8 +30,8 @@ let chunk amount ls =
   inner ls chunk_size [] [] |> List.map List.rev |> List.rev
 
 let without_element_at idx ls =
-  let rec inner l target_idx acc current_idx =
-    match l with
+  let rec inner ls target_idx acc current_idx =
+    match ls with
     | [] -> acc
     | x :: xs ->
         if current_idx = target_idx then

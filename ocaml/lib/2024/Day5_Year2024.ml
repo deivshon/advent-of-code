@@ -3,7 +3,7 @@ let parse_page_orderings raw_page_ordering =
   |> String.split_on_char '\n'
   |> List.map (String.split_on_char '|')
   |> List.map (List.map int_of_string)
-  |> List.map (fun l -> (List.hd l, List.nth l 1))
+  |> List.map (fun ls -> (List.hd ls, List.nth ls 1))
 
 let parse_updates raw_updates =
   raw_updates
@@ -40,7 +40,7 @@ let is_valid_update orderings update =
   let ordered = List.sort (pages_compare orderings) update in
   List.for_all2 ( = ) update ordered
 
-let take_middle l = List.nth l (List.length l / 2)
+let take_middle ls = List.nth ls (List.length ls / 2)
 
 let first_solution raw_input =
   let orderings, updates = parse_puzzle_input raw_input in
@@ -51,7 +51,6 @@ let first_solution raw_input =
   |> Result.ok
 
 let second_solution raw_input =
-  let take_middle l = List.nth l (List.length l / 2) in
   let orderings, updates = parse_puzzle_input raw_input in
   let invalid_updates =
     let filter_fn update = not (is_valid_update orderings update) in

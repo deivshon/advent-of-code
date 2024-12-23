@@ -3,7 +3,7 @@ let parse_puzzle_input raw_input =
   |> StringList.remove_empty
   |> List.map (String.split_on_char ' ')
   |> List.map StringList.remove_empty
-  |> List.map (fun l -> List.map int_of_string l)
+  |> List.map (fun ls -> List.map int_of_string ls)
 
 type report_direction = Increasing | Decreasing
 

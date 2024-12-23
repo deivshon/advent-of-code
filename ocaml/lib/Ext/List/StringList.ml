@@ -1,8 +1,8 @@
 let remove_empty = List.filter (fun line -> String.length line > 0)
 
-let rstrip_empty l =
-  let rec inner l acc keep_removing =
-    match l with
+let rstrip_empty ls =
+  let rec inner ls acc keep_removing =
+    match ls with
     | [] -> acc
     | x :: xs ->
         if not keep_removing then
@@ -11,4 +11,4 @@ let rstrip_empty l =
           (inner [@tailcall]) xs acc keep_removing
         else (inner [@tailcall]) xs (x :: acc) false
   in
-  inner (List.rev l) [] true
+  inner (List.rev ls) [] true
