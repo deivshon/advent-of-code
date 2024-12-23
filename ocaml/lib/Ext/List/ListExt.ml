@@ -40,14 +40,18 @@ let without_element_at idx ls =
   in
   inner ls idx [] 0 |> List.rev
 
-let par_map f ls =
+let par f ls_f ls =
   let threads_amount =
     min (Domain.recommended_domain_count ()) (List.length ls)
   in
   let results =
     let chunked = chunk threads_amount ls in
-    let map_chunk f idx () = List.map f (List.nth chunked idx) in
-    List.init (List.length chunked) (fun idx -> Domain.spawn (map_chunk f idx))
+    let compute_chunk f idx () = ls_f f (List.nth chunked idx) in
+    List.init (List.length chunked) (fun idx ->
+        Domain.spawn (compute_chunk f idx))
   in
   let step acc domain = Domain.join domain :: acc in
   List.fold_left step [] results |> List.flatten
+
+let par_map f ls = par f List.map ls
+let par_filter f ls = par f List.filter ls
