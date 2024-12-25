@@ -48,4 +48,4 @@ let () =
       match requested with
       | Some s -> List.iter execute_solution s
       | None -> List.iter execute_solution solutions)
-  | Error e -> Printf.eprintf "error: %s" e
+  | Error e -> Printf.eprintf "error: %s\n" e
