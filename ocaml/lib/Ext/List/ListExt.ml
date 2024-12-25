@@ -1,5 +1,16 @@
 let count f ls = List.fold_left (fun acc v -> if f v then acc + 1 else acc) 0 ls
 
+let find_all_index f ls =
+  let rec inner f ls acc idx =
+    match ls with
+    | [] -> List.rev acc
+    | x :: xs -> (
+        match f x with
+        | false -> (inner [@tailcall]) f xs acc (idx + 1)
+        | true -> (inner [@tailcall]) f xs (idx :: acc) (idx + 1))
+  in
+  inner f ls [] 0
+
 let remove_duplicates f ls =
   let step acc x =
     match List.find_index (f x) acc with Some _ -> acc | None -> x :: acc

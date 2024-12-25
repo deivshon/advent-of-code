@@ -37,6 +37,19 @@ let find_index f matrix =
   in
   inner f matrix 0
 
+let find_all_index f matrix =
+  let rec inner f matrix row_idx acc =
+    match matrix with
+    | [] -> acc |> List.rev |> List.flatten
+    | x :: xs ->
+        let found_in_row =
+          ListExt.find_all_index f x
+          |> List.map (fun col_idx -> (row_idx, col_idx))
+        in
+        (inner [@tailcall]) f xs (row_idx + 1) (found_in_row :: acc)
+  in
+  inner f matrix 0 []
+
 let map f matrix = List.map (fun row -> List.map f row) matrix
 
 let init_flatten f matrix =
@@ -98,3 +111,8 @@ let get_diagonals matrix =
   let bottom_left = bottom_positions |> List.map get_left_diagonal in
   let bottom_right = bottom_positions |> List.map get_right_diagonal in
   left @ right @ bottom_left @ bottom_right
+
+let is_within_bounds matrix =
+  let dimensions = get_dimensions matrix in
+  let rows, cols = dimensions in
+  fun ~row ~col -> row >= 0 && row < rows && col >= 0 && col < cols
