@@ -35,9 +35,7 @@ let walk ?(new_obstacle = None) position direction world_map =
       || position_col >= cols
     then (acc, None)
     else
-      let current =
-        Matrix.element_at ~row:position_row ~col:position_col world_map
-      in
+      let current = Matrix.element_at (position_row, position_col) world_map in
       let position_is_new_obstacle =
         match new_obstacle with
         | Some obstacle_position -> position = obstacle_position
@@ -118,7 +116,7 @@ let second_solution raw_input =
   in
   List.filter (fun position -> position <> start_position) walked
   |> ListExt.par_map (enters_loop start_position Up world_map)
-  |> ListExt.count Fun.id
+  |> BoolList.count_true
   |> Result.ok
   |> Result.map string_of_int
 

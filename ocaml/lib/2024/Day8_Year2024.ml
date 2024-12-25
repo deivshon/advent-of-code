@@ -2,8 +2,8 @@ let parse_puzzle_input raw_input =
   raw_input |> StringList.remove_empty |> List.map CharList.from_string
 
 let get_antennas_syms world_map =
-  let init_cell world_map row_idx col_idx =
-    let cell_content = Matrix.element_at ~row:row_idx ~col:col_idx world_map in
+  let init_cell world_map ri ci =
+    let cell_content = Matrix.element_at (ri, ci) world_map in
     match cell_content with '.' -> None | _ -> Some cell_content
   in
   Matrix.init_flatten (init_cell world_map) world_map
@@ -30,8 +30,7 @@ let get_antenna_antinodes_line antenna_index same_sym_indexes world_map =
   let map_single a1 a2 =
     let rec inner a1 a2 acc coeff =
       let current_antinodes =
-        get_antenna_pair_antinodes a1 a2 ~coeff
-        |> List.filter (fun (row, col) -> is_within_map ~row ~col)
+        get_antenna_pair_antinodes a1 a2 ~coeff |> List.filter is_within_map
       in
       match List.length current_antinodes with
       | 0 -> acc |> List.rev |> List.flatten
@@ -57,7 +56,7 @@ let get_sym_antinodes world_map ~whole_line sym =
   inner indexes []
   |>
   let is_within_map = Matrix.is_within_bounds world_map in
-  List.filter (fun (row, col) -> is_within_map ~row ~col)
+  List.filter is_within_map
 
 let get_antinodes ~whole_line world_map =
   let syms = get_antennas_syms world_map in

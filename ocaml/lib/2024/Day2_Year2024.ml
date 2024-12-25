@@ -12,19 +12,19 @@ let is_valid_report_part1 report =
     match levels with
     | [] -> true
     | [ _ ] -> true
-    | l1 :: l2 :: rest -> (
+    | ls1 :: ls2 :: rest -> (
         let current_direction =
-          if l1 - l2 > 0 then Increasing else Decreasing
+          if ls1 - ls2 > 0 then Increasing else Decreasing
         in
-        let distance = Int.abs (l1 - l2) in
+        let distance = Int.abs (ls1 - ls2) in
         let distance_exceeded = distance > 3 || distance == 0 in
         if distance_exceeded then false
         else
           match previous_direction with
-          | None -> (inner [@tailcall]) (l2 :: rest) (Some current_direction)
+          | None -> (inner [@tailcall]) (ls2 :: rest) (Some current_direction)
           | Some d ->
               if current_direction != d then false
-              else (inner [@tailcall]) (l2 :: rest) previous_direction)
+              else (inner [@tailcall]) (ls2 :: rest) previous_direction)
   in
   inner report None
 
@@ -36,9 +36,7 @@ let is_valid_report_part2 report =
 let solution ~report_validity_fn raw_input =
   let puzzle_input = parse_puzzle_input raw_input in
   let successful_reports =
-    List.map report_validity_fn puzzle_input
-    |> List.filter Fun.id
-    |> List.length
+    List.map report_validity_fn puzzle_input |> BoolList.count_true
   in
   Ok (string_of_int successful_reports)
 

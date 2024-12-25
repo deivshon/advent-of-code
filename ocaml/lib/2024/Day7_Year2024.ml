@@ -14,20 +14,18 @@ let parse_puzzle_input raw_input =
   raw_input |> StringList.remove_empty |> List.map parse_line
 
 let ( ++ ) a b =
-  let a_str = string_of_int a in
-  let b_str = string_of_int b in
-  String.concat "" [ a_str; b_str ] |> int_of_string
+  String.concat "" [ string_of_int a; string_of_int b ] |> int_of_string
 
 let is_possible_equation ~include_concatenation equation =
   let result, numbers = equation in
-  let step acc right =
-    let map_single left =
+  let step acc r =
+    let map_single l =
       match include_concatenation with
-      | true -> [ right * left; right + left; left ++ right ]
-      | false -> [ right * left; right + left ]
+      | true -> [ r * l; r + l; l ++ r ]
+      | false -> [ r * l; r + l ]
     in
     match acc with
-    | [] -> [ right ]
+    | [] -> [ r ]
     | acc -> List.map map_single acc |> List.flatten
   in
   let all_possible_results = List.fold_left step [] numbers in
