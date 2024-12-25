@@ -15,7 +15,7 @@ let find_start_position world_map =
   Matrix.find_index is_starting_position world_map
 
 let without_start_position world_map =
-  Matrix.map (fun char -> if char != '^' then char else '.') world_map
+  Matrix.map (fun char -> if char <> '^' then char else '.') world_map
 
 let next_position position_row position_col direction =
   match direction with

@@ -17,13 +17,13 @@ let is_valid_report_part1 report =
           if ls1 - ls2 > 0 then Increasing else Decreasing
         in
         let distance = Int.abs (ls1 - ls2) in
-        let distance_exceeded = distance > 3 || distance == 0 in
+        let distance_exceeded = distance > 3 || distance = 0 in
         if distance_exceeded then false
         else
           match previous_direction with
           | None -> (inner [@tailcall]) (ls2 :: rest) (Some current_direction)
           | Some d ->
-              if current_direction != d then false
+              if current_direction <> d then false
               else (inner [@tailcall]) (ls2 :: rest) previous_direction)
   in
   inner report None

@@ -12,7 +12,7 @@ let get_dimensions m =
           let row_cols = List.length x in
           match expected_cols with
           | Some n ->
-              if n != row_cols then
+              if n <> row_cols then
                 Error "rows don't all have the same amount of columns"
               else (inner [@tailcall]) xs expected_cols
           | None -> (inner [@tailcall]) xs (Some row_cols))
