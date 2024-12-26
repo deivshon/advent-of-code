@@ -1,5 +1,16 @@
 let count f ls = List.fold_left (fun acc v -> if f v then acc + 1 else acc) 0 ls
 
+let count_from_index f idx ls =
+  let rec inner f idx ls acc =
+    match ls with
+    | [] -> acc
+    | x :: xs -> (
+        match idx = 0 with
+        | false -> (inner [@tailcall]) f (idx - 1) xs acc
+        | true -> (inner [@tailcall]) f 0 xs (if f x then acc + 1 else acc))
+  in
+  inner f idx ls 0
+
 let find_all_index f ls =
   let rec inner f ls acc idx =
     match ls with
@@ -11,9 +22,29 @@ let find_all_index f ls =
   in
   inner f ls [] 0
 
+let rev_index ls idx = List.length ls - 1 - idx
+
+let find_nth_index f n ls =
+  let rec inner f n ls idx =
+    match ls with
+    | [] -> None
+    | x :: xs -> (
+        match f x with
+        | true ->
+            if n = 1 then Some idx
+            else (inner [@tailcall]) f (n - 1) xs (idx + 1)
+        | false -> (inner [@tailcall]) f n xs (idx + 1))
+  in
+  if n <= 0 then None else inner f n ls 0
+
+let find_nth_index_rev f n ls =
+  find_nth_index f n ls |> Option.map (rev_index ls)
+
+let find_index_rev f ls = List.find_index f ls |> Option.map (rev_index ls)
+
 let rfind_index f ls =
   let ls = List.rev ls in
-  List.find_index f ls |> Option.map (fun idx -> List.length ls - 1 - idx)
+  List.find_index f ls |> Option.map (rev_index ls)
 
 let remove_duplicates f ls =
   let step acc x =
