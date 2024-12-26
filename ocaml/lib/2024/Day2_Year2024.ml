@@ -30,7 +30,7 @@ let is_valid_report_part1 report =
 
 let is_valid_report_part2 report =
   List.init (List.length report) Fun.id
-  |> List.map (fun idx -> report |> ListExt.without_element_at idx)
+  |> List.map (fun idx -> report |> ListExt.without_item_at idx)
   |> List.exists is_valid_report_part1
 
 let solution ~report_validity_fn raw_input =
