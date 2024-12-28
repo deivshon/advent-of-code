@@ -42,6 +42,19 @@ let find_nth_index_rev f n ls =
 
 let find_index_rev f ls = List.find_index f ls |> Option.map (rev_index ls)
 
+let find_index_wi f ls =
+  let rec inner f ls idx =
+    match ls with
+    | [] -> None
+    | x :: xs -> if f x idx then Some idx else (inner [@tailcall]) f xs (idx + 1)
+  in
+  inner f ls 0
+
+let find_wi f ls =
+  match find_index_wi f ls with
+  | None -> None
+  | Some idx -> Some (List.nth ls idx)
+
 let rfind_index f ls =
   let ls = List.rev ls in
   List.find_index f ls |> Option.map (rev_index ls)
@@ -106,6 +119,19 @@ let drop n ls =
 let with_item_at idx v ls =
   if idx < 0 || idx >= List.length ls then invalid_arg "with_item_at.idx"
   else take idx ls @ [ v ] @ drop (idx + 1) ls
+
+let max f ls =
+  let rec inner ls acc =
+    match ls with
+    | [] -> acc
+    | x :: xs -> (
+        match acc with
+        | None -> (inner [@tailcall]) xs (Some x)
+        | Some acc ->
+            let new_acc = if f x acc > 0 then Some x else Some acc in
+            (inner [@tailcall]) xs new_acc)
+  in
+  inner ls None
 
 let swap idx1 idx2 ls =
   let len = List.length ls in
