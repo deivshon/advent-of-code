@@ -10,6 +10,7 @@ let (all_solutions : solution list) =
   @ Aoc.Day7_Year2024.solutions
   @ Aoc.Day8_Year2024.solutions
   @ Aoc.Day9_Year2024.solutions
+  @ Aoc.Day10_Year2024.solutions
 
 let usage_message = "aoc -y <solution_year> -d <solution_day>"
 let year_arg = ref ""
