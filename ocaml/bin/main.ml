@@ -1,6 +1,6 @@
 open Aoc.Execution
 
-let (solutions : solution list) =
+let (all_solutions : solution list) =
   Aoc.Day1_Year2024.solutions
   @ Aoc.Day2_Year2024.solutions
   @ Aoc.Day3_Year2024.solutions
@@ -14,11 +14,13 @@ let (solutions : solution list) =
 let usage_message = "aoc -y <solution_year> -d <solution_day>"
 let year_arg = ref ""
 let day_arg = ref ""
+let part_arg = ref ""
 
 let speclist =
   [
     ("-y", Arg.Set_string year_arg, "Year");
     ("-d", Arg.Set_string day_arg, "Day");
+    ("-p", Arg.Set_string part_arg, "Part");
   ]
 
 let () =
@@ -29,16 +31,21 @@ let () =
       try
         let year = int_of_string year_arg.contents in
         let day = int_of_string day_arg.contents in
-        match
-          List.find_all (fun s -> s.year = year && s.day = day) solutions
-        with
-        | [] -> Error "no solution found for specified day and year"
+        let parts =
+          match part_arg.contents with
+          | "" -> [ 1; 2 ]
+          | _ -> [ int_of_string part_arg.contents ]
+        in
+        let matches_arguments solution =
+          solution.year = year
+          && solution.day = day
+          && List.mem solution.solution_number parts
+        in
+        match List.find_all matches_arguments all_solutions with
+        | [] -> Error "no solution found for specified arguments"
         | ls -> Ok (Some ls)
       with
-      | Not_found ->
-          Error
-            (Printf.sprintf "no solution found for day %s of year %s"
-               day_arg.contents year_arg.contents)
+      | Not_found -> Error "no solution found for the given arguments"
       | _ -> Error (Printf.sprintf "arguments could not be parsed")
     else if
       String.length year_arg.contents > 0 || String.length day_arg.contents > 0
@@ -48,6 +55,6 @@ let () =
   match requested_solutions with
   | Ok requested -> (
       match requested with
-      | Some s -> List.iter execute_solution s
-      | None -> List.iter execute_solution solutions)
+      | Some requested -> List.iter execute_solution requested
+      | None -> List.iter execute_solution all_solutions)
   | Error e -> Printf.eprintf "error: %s\n" e
