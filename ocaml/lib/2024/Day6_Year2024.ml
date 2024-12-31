@@ -56,7 +56,8 @@ let walk ?(new_obstacle = None) position direction world_map =
   inner position direction world_map [] position
 
 let get_unique_walked ?(new_obstacle = None) position direction world_map =
-  let visited_table = Hashtbl.create 5000 in
+  let visited_set = MutSet.create 5000 in
+
   let rec inner position direction world_map acc c =
     let walked, new_position =
       walk ~new_obstacle position direction world_map
@@ -71,11 +72,10 @@ let get_unique_walked ?(new_obstacle = None) position direction world_map =
     in
     let new_acc = walked_with_direction @ acc in
     let entered_loop =
-      List.exists (Hashtbl.mem visited_table) walked_with_direction
+      List.exists (MutSet.mem visited_set) walked_with_direction
     in
     let _mut_insert_in_visited =
-      walked_with_direction
-      |> List.iter (fun position -> Hashtbl.add visited_table position true)
+      walked_with_direction |> List.iter (MutSet.add visited_set)
     in
     match (entered_loop, new_position) with
     | true, _ | false, None ->
