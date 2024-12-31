@@ -108,3 +108,11 @@ let is_within_bounds m =
   let dimensions = get_dimensions m in
   let rows, cols = dimensions in
   fun (ri, ci) -> ri >= 0 && ri < rows && ci >= 0 && ci < cols
+
+let near ?(diags = false) ?(is_within_bounds = fun _ -> true) (ri, ci) =
+  ([ (ri + 1, ci); (ri, ci + 1); (ri - 1, ci); (ri, ci - 1) ]
+  @
+  if diags then
+    [ (ri + 1, ci + 1); (ri - 1, ci + 1); (ri - 1, ci - 1); (ri + 1, ci - 1) ]
+  else [])
+  |> List.filter is_within_bounds
