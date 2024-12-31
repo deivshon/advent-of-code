@@ -7,7 +7,7 @@ let parse_puzzle_input raw_input =
 
 let get_next_points is_within_bounds map (ri, ci) =
   let height = Matrix.element_at (ri, ci) map in
-  Matrix.near ~is_within_bounds (ri, ci)
+  Matrix.near_perp ~is_within_bounds (ri, ci)
   |> List.filter (fun coords -> Matrix.element_at coords map = height + 1)
 
 let get_trailhead_score ~unique_trails is_within_bounds map (ri, ci) =

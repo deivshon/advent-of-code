@@ -109,10 +109,43 @@ let is_within_bounds m =
   let rows, cols = dimensions in
   fun (ri, ci) -> ri >= 0 && ri < rows && ci >= 0 && ci < cols
 
-let near ?(diags = false) ?(is_within_bounds = fun _ -> true) (ri, ci) =
-  ([ (ri + 1, ci); (ri, ci + 1); (ri - 1, ci); (ri, ci - 1) ]
-  @
-  if diags then
-    [ (ri + 1, ci + 1); (ri - 1, ci + 1); (ri - 1, ci - 1); (ri + 1, ci - 1) ]
-  else [])
+let near_perp ?(is_within_bounds = fun _ -> true) (ri, ci) =
+  [ (ri + 1, ci); (ri, ci + 1); (ri - 1, ci); (ri, ci - 1) ]
   |> List.filter is_within_bounds
+
+let near_diag ?(is_within_bounds = fun _ -> true) (ri, ci) =
+  [ (ri + 1, ci + 1); (ri - 1, ci + 1); (ri - 1, ci - 1); (ri + 1, ci - 1) ]
+  |> List.filter is_within_bounds
+
+let near_all ?(is_within_bounds = fun _ -> true) rc =
+  near_perp ~is_within_bounds rc @ near_diag ~is_within_bounds rc
+
+let add_border f ?(thickness = 1) m =
+  if thickness <= 0 then invalid_arg "add_border.thickness"
+  else
+    let f = FunExt.curry2 f in
+    let prev_rows, prev_cols = get_dimensions m in
+
+    let new_rows, new_cols =
+      (prev_rows + (2 * thickness), prev_cols + (2 * thickness))
+    in
+    let new_border_line ri = List.init new_cols (f ri) in
+    let with_border_sides ri prev_row =
+      List.init thickness (f ri)
+      @ prev_row
+      @ List.init thickness (fun x -> f ri (prev_cols + 1 + x))
+    in
+
+    let rec inner ri acc =
+      match ri with
+      | upper_ri when ri >= new_rows - thickness ->
+          new_border_line upper_ri :: acc |> List.rev
+      | lower_ri when ri < thickness ->
+          (inner [@tailcall]) (ri + 1) (new_border_line lower_ri :: acc)
+      | middle_ri ->
+          let new_line =
+            with_border_sides middle_ri (List.nth m (middle_ri - thickness))
+          in
+          (inner [@tailcall]) (ri + 1) (new_line :: acc)
+    in
+    inner 0 []

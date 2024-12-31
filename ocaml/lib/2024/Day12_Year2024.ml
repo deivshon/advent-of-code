@@ -9,7 +9,7 @@ let analyze_plot map point =
 
   let process_points points =
     let map_single point =
-      let near = Matrix.near ~is_within_bounds point in
+      let near = Matrix.near_perp ~is_within_bounds point in
       let near_out_of_map = 4 - List.length near in
       let near_same, near_different =
         near |> List.partition (fun p -> Matrix.element_at p map = plot_type)
