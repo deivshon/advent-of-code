@@ -1,5 +1,5 @@
 {
   "editor.formatOnSave": true,
   "python.analysis.typeCheckingMode": "strict",
-  "conventionalCommits.scopes": ["ocaml"]
+  "conventionalCommits.scopes": ["ocaml", "rust"]
 }
