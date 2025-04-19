@@ -4,7 +4,7 @@ pub struct Solution {
     pub year: i32,
     pub day: i32,
     pub part: i32,
-    pub solution: fn(String) -> String,
+    pub solution: fn(String) -> Option<String>,
 }
 
 pub static SOLUTIONS: &'static [Solution] = &[

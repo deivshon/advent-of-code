@@ -83,7 +83,14 @@ fn main() {
         };
         println!(
             "{}/{} P{}: {} | {}",
-            solution.year, solution.day, solution.part, result, time_taken_pretty
+            solution.year,
+            solution.day,
+            solution.part,
+            match result {
+                Some(s) => s,
+                None => String::from("No solution found"),
+            },
+            time_taken_pretty
         )
     });
 }
