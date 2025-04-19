@@ -3,7 +3,7 @@ use std::collections::HashSet;
 fn parse_input(input: String) -> Vec<i32> {
     return input
         .split("\n")
-        .map(|n| str::parse::<i32>(n))
+        .map(str::parse::<i32>)
         .filter_map(Result::ok)
         .collect();
 }
@@ -30,9 +30,8 @@ pub fn part_2(input: String) -> Option<String> {
 
     for n1 in numbers.iter() {
         for n2 in numbers.iter() {
-            match numbers.get(&(TARGET - *n1 - *n2)) {
-                Some(n3) => return Some((*n1 * *n2 * *n3).to_string()),
-                None => (),
+            if let Some(n3) = numbers.get(&(TARGET - *n1 - *n2)) {
+                return Some((*n1 * *n2 * *n3).to_string());
             }
         }
     }

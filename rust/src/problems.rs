@@ -7,7 +7,7 @@ pub struct Solution {
     pub solution: fn(String) -> Option<String>,
 }
 
-pub static SOLUTIONS: &'static [Solution] = &[
+pub static SOLUTIONS: &[Solution] = &[
     Solution {
         year: 2020,
         day: 1,
