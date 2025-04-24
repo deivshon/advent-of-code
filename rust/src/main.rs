@@ -72,6 +72,18 @@ fn main() {
             }
         };
 
+        let correctness_indicator = match (&result, solution.expected) {
+            (Some(result), Some(expected)) => {
+                if result == expected {
+                    String::from("✅")
+                } else {
+                    String::from("❌")
+                }
+            }
+            (None, _) => String::from("❓"),
+            (_, None) => String::from("❓"),
+        };
+
         let time_taken_pretty = {
             if time_taken.as_micros() < 2500 {
                 format!("{}μs", time_taken.as_micros())
@@ -81,16 +93,30 @@ fn main() {
                 format!("{}s", time_taken.as_secs())
             }
         };
+
+        let expected_string: Option<String> = match (&result, solution.expected) {
+            (Some(result), Some(expected)) => {
+                if result != expected {
+                    Some(format!(" (expected {})", expected))
+                } else {
+                    None
+                }
+            }
+            (_, _) => None,
+        };
+
         println!(
-            "{}/{} P{}: {} | {}",
+            "{} | {}/{} P{}: {:6} | {}{}",
+            correctness_indicator,
             solution.year,
             solution.day,
             solution.part,
+            time_taken_pretty,
             match result {
                 Some(s) => s,
                 None => String::from("No solution found"),
             },
-            time_taken_pretty
+            expected_string.unwrap_or_default()
         )
     });
 }
