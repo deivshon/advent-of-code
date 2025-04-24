@@ -80,8 +80,7 @@ fn main() {
                     String::from("❌")
                 }
             }
-            (None, _) => String::from("❓"),
-            (_, None) => String::from("❓"),
+            (_, _) => String::from("❓"),
         };
 
         let time_taken_pretty = {
