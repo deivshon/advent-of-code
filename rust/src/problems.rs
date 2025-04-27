@@ -1,10 +1,12 @@
+use anyhow::Result;
+
 use crate::year_2020;
 
 pub struct Solution {
     pub year: i32,
     pub day: i32,
     pub part: i32,
-    pub solution: fn(String) -> Option<String>,
+    pub solution: fn(String) -> Result<String>,
     pub expected: Option<&'static str>,
 }
 

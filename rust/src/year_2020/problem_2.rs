@@ -1,3 +1,6 @@
+use anyhow::{Error, Result};
+use thiserror::Error;
+
 struct Entry {
     n1: i32,
     n2: i32,
@@ -5,10 +8,22 @@ struct Entry {
     password: String,
 }
 
-fn parse_input_line(line: &str) -> Option<Entry> {
+#[derive(Error, Debug)]
+enum EntryParseError {
+    #[error("found {0} sections, expected 3")]
+    SectionsMismatch(usize),
+    #[error("found {0} number sections, expected 2")]
+    NumbersSectionsMismatch(usize),
+    #[error("found {0} letters sections, expected 2")]
+    LettersSectionsMismatch(usize),
+    #[error("no letter in letter section")]
+    NoLetter,
+}
+
+fn parse_input_line(line: &str) -> Result<Entry> {
     let split = line.split(" ").collect::<Vec<&str>>();
     if split.len() != 3 {
-        return None;
+        return Err(EntryParseError::SectionsMismatch(split.len()).into());
     }
 
     let numbers_section = split[0];
@@ -17,17 +32,20 @@ fn parse_input_line(line: &str) -> Option<Entry> {
 
     let numbers_split = numbers_section.split("-").collect::<Vec<&str>>();
     if numbers_split.len() != 2 {
-        return None;
+        return Err(EntryParseError::NumbersSectionsMismatch(numbers_split.len()).into());
     }
-    let n1 = numbers_split[0].parse::<i32>().ok()?;
-    let n2 = numbers_split[1].parse::<i32>().ok()?;
+    let n1 = numbers_split[0].parse::<i32>()?;
+    let n2 = numbers_split[1].parse::<i32>()?;
 
     if letter_section.len() != 2 {
-        return None;
+        return Err(EntryParseError::LettersSectionsMismatch(numbers_split.len()).into());
     }
-    let letter = letter_section.chars().next()?;
+    let letter = match letter_section.chars().next() {
+        Some(l) => l,
+        None => return Err(EntryParseError::NoLetter.into()),
+    };
 
-    return Some(Entry {
+    return Ok(Entry {
         n1,
         n2,
         letter,
@@ -35,12 +53,27 @@ fn parse_input_line(line: &str) -> Option<Entry> {
     });
 }
 
-fn parse_input(input: String) -> Vec<Entry> {
-    return input.split("\n").filter_map(parse_input_line).collect();
+#[derive(Error, Debug)]
+enum InputParseError {
+    #[error("error parsing line {0}: {1}")]
+    EntryParseError(usize, Error),
 }
 
-pub fn part_1(input: String) -> Option<String> {
-    let entries = parse_input(input);
+fn parse_input(input: String) -> Result<Vec<Entry>> {
+    return Result::from_iter(
+        input
+            .lines()
+            .filter(|line| !line.is_empty())
+            .enumerate()
+            .map(|(idx, line)| {
+                parse_input_line(line)
+                    .map_err(|err| InputParseError::EntryParseError(idx + 1, err).into())
+            }),
+    );
+}
+
+pub fn part_1(input: String) -> Result<String> {
+    let entries = parse_input(input)?;
     let valid: Vec<&Entry> = entries
         .iter()
         .filter(|entry| {
@@ -57,11 +90,11 @@ pub fn part_1(input: String) -> Option<String> {
         })
         .collect();
 
-    return Some(valid.len().to_string());
+    return Ok(valid.len().to_string());
 }
 
-pub fn part_2(input: String) -> Option<String> {
-    let entries = parse_input(input);
+pub fn part_2(input: String) -> Result<String> {
+    let entries = parse_input(input)?;
     let valid: Vec<&Entry> = entries
         .iter()
         .filter(|entry| {
@@ -80,5 +113,5 @@ pub fn part_2(input: String) -> Option<String> {
         })
         .collect();
 
-    return Some(valid.len().to_string());
+    return Ok(valid.len().to_string());
 }

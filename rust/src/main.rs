@@ -73,7 +73,7 @@ fn main() {
         };
 
         let correctness_indicator = match (&result, solution.expected) {
-            (Some(result), Some(expected)) => {
+            (Ok(result), Some(expected)) => {
                 if result == expected {
                     String::from("✅")
                 } else {
@@ -94,7 +94,7 @@ fn main() {
         };
 
         let expected_string: Option<String> = match (&result, solution.expected) {
-            (Some(result), Some(expected)) => {
+            (Ok(result), Some(expected)) => {
                 if result != expected {
                     Some(format!(" (expected {})", expected))
                 } else {
@@ -112,8 +112,8 @@ fn main() {
             solution.part,
             time_taken_pretty,
             match result {
-                Some(s) => s,
-                None => String::from("No solution found"),
+                Ok(s) => s,
+                Err(e) => format!("error computing solution: {}", e),
             },
             expected_string.unwrap_or_default()
         )

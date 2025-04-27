@@ -1,3 +1,8 @@
+use std::iter::Product;
+
+use anyhow::Result;
+use thiserror::Error;
+
 enum Tile {
     Free,
     Tree,
@@ -38,9 +43,13 @@ impl Area {
     }
 }
 
+#[derive(Error, Debug)]
 enum AreaParseError {
+    #[error("malformed area")]
     MalformedArea,
-    UnknownTile,
+    #[error("unknown tile: {0}")]
+    UnknownTile(char),
+    #[error("no row length after computing map")]
     NoRowLength,
 }
 
@@ -66,7 +75,7 @@ impl TryFrom<String> for Area {
                 match tile {
                     '.' => tiles_row.push(Tile::Free),
                     '#' => tiles_row.push(Tile::Tree),
-                    _ => return Err(AreaParseError::UnknownTile),
+                    unknown_tile => return Err(AreaParseError::UnknownTile(unknown_tile)),
                 }
             }
 
@@ -80,23 +89,22 @@ impl TryFrom<String> for Area {
     }
 }
 
-pub fn part_1(input: String) -> Option<String> {
-    let area = Area::try_from(input).ok()?;
+pub fn part_1(input: String) -> Result<String> {
+    let area = Area::try_from(input)?;
 
-    return Some(
-        area.count_trees(
+    return Ok(area
+        .count_trees(
             Point { x: 0, y: 0 },
             Slope {
                 x_increment: 3,
                 y_increment: 1,
             },
         )
-        .to_string(),
-    );
+        .to_string());
 }
 
-pub fn part_2(input: String) -> Option<String> {
-    let area = Area::try_from(input).ok()?;
+pub fn part_2(input: String) -> Result<String> {
+    let area = Area::try_from(input)?;
     let slopes = [
         Slope {
             x_increment: 1,
@@ -120,9 +128,10 @@ pub fn part_2(input: String) -> Option<String> {
         },
     ];
 
-    return slopes
-        .map(|slope| area.count_trees(Point { x: 0, y: 0 }, slope))
-        .into_iter()
-        .reduce(|acc, n| acc * n)
-        .map(|sum| sum.to_string());
+    return Ok(i64::product(
+        slopes
+            .map(|slope| area.count_trees(Point { x: 0, y: 0 }, slope))
+            .into_iter(),
+    )
+    .to_string());
 }
