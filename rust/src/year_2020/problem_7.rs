@@ -126,3 +126,23 @@ pub fn part_1(input: String) -> Result<String> {
     let bags_map = parse_input(input)?;
     return Ok(get_target_containers(TARGET_BAG, bags_map).to_string());
 }
+
+fn get_target_contained(target_bag: &str, bags_map: &HashMap<String, Vec<(String, i32)>>) -> i32 {
+    let contained = match bags_map.get(target_bag) {
+        Some(contained) => contained,
+        None => return 0,
+    };
+    if contained.is_empty() {
+        return 0;
+    }
+
+    return contained
+        .iter()
+        .map(|(bag, amount)| amount + amount * get_target_contained(bag, bags_map))
+        .sum();
+}
+
+pub fn part_2(input: String) -> Result<String> {
+    let bags_map = parse_input(input)?;
+    return Ok(get_target_contained(TARGET_BAG, &bags_map).to_string());
+}
