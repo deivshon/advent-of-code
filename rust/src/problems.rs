@@ -137,4 +137,18 @@ pub static SOLUTIONS: &[Solution] = &[
         solution: year_2020::problem_9::part_2,
         expected: Some("4023754"),
     },
+    Solution {
+        year: 2020,
+        day: 10,
+        part: 1,
+        solution: year_2020::problem_10::part_1,
+        expected: Some("2400"),
+    },
+    Solution {
+        year: 2020,
+        day: 10,
+        part: 1,
+        solution: year_2020::problem_10::part_2,
+        expected: Some("338510590509056"),
+    },
 ];
