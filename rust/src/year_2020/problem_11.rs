@@ -3,6 +3,7 @@ use std::fmt::Display;
 use anyhow::Result;
 use thiserror::Error;
 
+use crate::ext::matrix::{self, WalkUntilOpts};
 use crate::ext::traits::{adjacent::Adjacent, empty_items::EmptyItems};
 
 #[derive(Clone, Debug)]
@@ -31,53 +32,90 @@ impl SeatsLayout {
             .sum();
     }
 
-    fn stabilization_step(&self, previous: Vec<Vec<LayoutCell>>) -> (Vec<Vec<LayoutCell>>, bool) {
-        let mut already_stabilized = true;
-
-        let mut updated_layout: Vec<Vec<LayoutCell>> = Vec::new();
-
-        for row_idx in 0..previous.len() {
-            let mut updated_row: Vec<LayoutCell> = Vec::new();
-
-            for col_idx in 0..previous[row_idx].len() {
-                match previous[row_idx][col_idx] {
-                    LayoutCell::Seat(occupied) => {
-                        let adjacents_occupied = previous
-                            .adjacent_to((row_idx, col_idx))
-                            .iter()
-                            .filter(|cell| matches!(cell, Some(LayoutCell::Seat(true))))
-                            .count();
-
-                        if occupied && adjacents_occupied >= 4 {
-                            updated_row.push(LayoutCell::Seat(false));
-                            already_stabilized = false;
-                        } else if !occupied && adjacents_occupied == 0 {
-                            updated_row.push(LayoutCell::Seat(true));
-                            already_stabilized = false;
-                        } else {
-                            updated_row.push(LayoutCell::Seat(occupied))
-                        }
-                    }
-                    LayoutCell::Floor => updated_row.push(LayoutCell::Floor),
-                }
-            }
-
-            updated_layout.push(updated_row);
-        }
-
-        return (updated_layout, already_stabilized);
-    }
-
-    pub fn stabilized(&self) -> Self {
+    pub fn stabilized(&self, immediate_adjecency: bool) -> Self {
         let mut rows: Vec<Vec<LayoutCell>> = self.rows.clone();
 
         let mut stabilized = false;
         while !stabilized {
-            (rows, stabilized) = self.stabilization_step(rows);
+            (rows, stabilized) = stabilization_step(rows, immediate_adjecency);
         }
 
         return SeatsLayout { rows };
     }
+}
+
+fn stabilization_step(
+    previous: Vec<Vec<LayoutCell>>,
+    immediate_adjacency: bool,
+) -> (Vec<Vec<LayoutCell>>, bool) {
+    let needed_to_free_seat = if immediate_adjacency { 4 } else { 5 };
+
+    let mut already_stabilized = true;
+    let mut updated_layout: Vec<Vec<LayoutCell>> = Vec::new();
+    for row_idx in 0..previous.len() {
+        let mut updated_row: Vec<LayoutCell> = Vec::new();
+
+        for col_idx in 0..previous[row_idx].len() {
+            match previous[row_idx][col_idx] {
+                LayoutCell::Seat(occupied) => {
+                    let adjacents_occupied = match immediate_adjacency {
+                        true => previous.adjacent_to((row_idx, col_idx)),
+                        false => {
+                            find_first_visible(&previous, (row_idx as isize, col_idx as isize))
+                        }
+                    }
+                    .iter()
+                    .filter(|cell| matches!(cell, Some(LayoutCell::Seat(true))))
+                    .count();
+
+                    if occupied && adjacents_occupied >= needed_to_free_seat {
+                        updated_row.push(LayoutCell::Seat(false));
+                        already_stabilized = false;
+                    } else if !occupied && adjacents_occupied == 0 {
+                        updated_row.push(LayoutCell::Seat(true));
+                        already_stabilized = false;
+                    } else {
+                        updated_row.push(LayoutCell::Seat(occupied))
+                    }
+                }
+                LayoutCell::Floor => updated_row.push(LayoutCell::Floor),
+            }
+        }
+
+        updated_layout.push(updated_row);
+    }
+
+    return (updated_layout, already_stabilized);
+}
+
+const ALL_DIRECTION_STEPS: [(isize, isize); 8] = [
+    (-1, 0),
+    (-1, 1),
+    (0, 1),
+    (1, 1),
+    (1, 0),
+    (1, -1),
+    (0, -1),
+    (-1, -1),
+];
+
+fn find_first_visible(
+    previous: &[Vec<LayoutCell>],
+    starting_position: (isize, isize),
+) -> [Option<&LayoutCell>; 8] {
+    let mut result: [Option<&LayoutCell>; 8] = [const { None }; 8];
+    for step_idx in 0..ALL_DIRECTION_STEPS.len() {
+        result[step_idx] = matrix::walk_until(
+            previous,
+            |cell| !matches!(*cell, LayoutCell::Floor),
+            WalkUntilOpts {
+                start_position: starting_position,
+                step: ALL_DIRECTION_STEPS[step_idx],
+            },
+        );
+    }
+
+    return result;
 }
 
 impl Display for SeatsLayout {
@@ -144,7 +182,14 @@ impl TryFrom<String> for SeatsLayout {
 
 pub fn part_1(input: String) -> Result<String> {
     let layout = SeatsLayout::try_from(input)?;
-    let stabilized = layout.stabilized();
+    let stabilized = layout.stabilized(true);
+
+    return Ok(stabilized.count_seats(true).to_string());
+}
+
+pub fn part_2(input: String) -> Result<String> {
+    let layout = SeatsLayout::try_from(input)?;
+    let stabilized = layout.stabilized(false);
 
     return Ok(stabilized.count_seats(true).to_string());
 }
